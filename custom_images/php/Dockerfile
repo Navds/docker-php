@@ -1,4 +1,5 @@
-FROM php:7.2-fpm
+ARG version=7.2
+FROM php:${version}-fpm
 MAINTAINER Navalona Ramanantoanina <job.navds@gmail.com>
 
 RUN apt-get update && apt-get install -y \

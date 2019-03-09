@@ -1,27 +1,35 @@
 # This aim to be a standard compose for a php-project (magento in mind)
 # Author: Navalona Ramanantoanina <job.navds@gmail.com>
 #
-php:
-    build: ./custom_images/php
-    volumes:
-        - ./code:/code
+version: '3'
+services:
+    php:
+        build: ./custom_images/php
+        volumes:
+            - ..:/code
+        links:
+            - db
 
-db:
-    image: mysql:5.7
-    ports:
-        - "3307:3306"
-    environment:
-        - MYSQL_ROOT_PASSWORD=changeme
-    volumes:
-        - ./persistence/mysql:/var/lib/mysql
+    db:
+        image: mysql:5.7
+        ports:
+            - "3307:3306"
+        environment:
+            - MYSQL_ROOT_PASSWORD=changeme
+        volumes:
+            - ./persistence/mysql:/var/lib/mysql
 
-web:
-    image: nginx:latest
-    ports:
-        - "8080:80"
-    volumes:
-        - ./code:/code
-        - ./config/site.conf:/etc/nginx/conf.d/default.conf
-    links:
-        - php
-        - db
+    web:
+        depends_on:
+            - db
+            - php
+        image: nginx:latest
+        ports:
+            - "80:80"
+        volumes:
+            - ..:/code
+            - ./config/site.conf:/etc/nginx/conf.d/default.conf
+            - ./persistence/nginx/log:/var/log/nginx
+        links:
+            - php
+            - db
